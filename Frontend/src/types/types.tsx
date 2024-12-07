@@ -28,7 +28,7 @@ export type DeliveryPartner = {
     name: string;
     email: string;
     phone: string;
-    status: 'active' | 'inactive';
+    status: 'new' | 'pending' | 'active' | 'inactive';
     currentLoad: number;
     areas: string[];
     shift: Shift;
@@ -76,39 +76,72 @@ export const loginSchema = z.object({
     }),
 })
 
-export const registerSchema = z.object({
+// Base schema for common fields
+export const baseRegisterSchema = z.object({
     name: z.string().min(2, {
-        message: "Name must be atleast 2 characters long."
+      message: "Name must be at least 2 characters long.",
     }),
     email: z.string().email({
-        message: "Please enter a valid email address."
+      message: "Please enter a valid email address.",
     }),
     password: z.string().min(6, {
-        message: "Password must be atleast 6 characters long."
+      message: "Password must be at least 6 characters long.",
     }),
     confirmPassword: z.string(),
-    role: z.enum(['admin', 'partner']),
-    adminCode: z.string().optional(),
+    role: z.enum(["admin", "partner"]),
     phone: z.string().trim().regex(/^\+?[0-9]{10,15}$/, {
-        message: "Phone number must be 10-15 digits long."
+      message: "Phone number must be 10-15 digits long.",
     }),
-    areas: z.array(z.string()).min(1, {
-        message: "Atleast one area must be specified."
-    }),
-    shift: z.object({
-        slot: z.string().min(1, {
-            message: "Please select a valid shift."
-        })
+  })
+  
+  // Admin-specific schema
+  export const adminRegisterSchema = baseRegisterSchema
+    .extend({
+      adminCode: z.string().nonempty({
+        message: "Admin code is required.",
+      }),
     })
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match.",
-    path: ['confirmPassword'],
-}).refine((data) => {
-    if (data.role === 'admin' && (!data.adminCode || data.adminCode !== 'qwertyuiop')) {
-        return false;
-    }
-    return true;
-}, {
-    message: "Invalid admin registration code",
-    path: ['adminCode'],
-});
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match.",
+        path: ["confirmPassword"],
+      })
+    .refine(
+      (data) => data.role === "admin",
+      {
+        message: "Role must be 'admin' for this schema.",
+        path: ["role"],
+      }
+    )
+    .refine(
+      (data) => data.adminCode === "qwertyuiop",
+      {
+        message: "Invalid admin registration code.",
+        path: ["adminCode"],
+      }
+    );
+  
+  // Partner-specific schema
+  export const partnerRegisterSchema = baseRegisterSchema
+    .extend({
+      areas: z
+        .array(z.string())
+        .min(1, {
+          message: "At least one area must be specified.",
+        }),
+      shift: z.object({
+        slot: z.string().min(1, {
+          message: "Please select a valid shift.",
+        }),
+      }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match.",
+        path: ["confirmPassword"],
+      })
+    .refine(
+      (data) => data.role === "partner",
+      {
+        message: "Role must be 'partner' for this schema.",
+        path: ["role"],
+      }
+    );

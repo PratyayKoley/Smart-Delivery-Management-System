@@ -13,7 +13,7 @@ export const PartnerProfile = () => {
   const [partner, setPartner] = useState<DeliveryPartner | null>(null); // Updated to handle `null` for loading state
   const [loading, setLoading] = useState(true); // Add loading state
   const [error, setError] = useState<string | null>(null); // Error state
-  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState<boolean>(false);
 
   const getUserData = async () => {
     try {
@@ -58,7 +58,7 @@ export const PartnerProfile = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold md:text-3xl">Partner Profile</h1>
-        <Button variant='outline' onClick={() => setShowJoinModal(true)}>Request to Join</Button>
+        {partner.status === 'new' && (<Button variant='outline' onClick={() => setShowJoinModal(true)}>Request to Join</Button>)}
         {showJoinModal && (
           <JoinRequestModal
             partner={partner!}

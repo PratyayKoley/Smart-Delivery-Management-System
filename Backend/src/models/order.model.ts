@@ -1,6 +1,6 @@
-import { InferSchemaType, model, Schema } from "mongoose";
+import mongoose, { InferSchemaType, model, Schema } from "mongoose";
 
-const OrderSchema: Schema = new Schema({
+const OrderSchema = new Schema({
     orderNumber: { type: Number, required: true, unique: true },
     customer: {
         name: { type: String, required: true },
@@ -15,12 +15,12 @@ const OrderSchema: Schema = new Schema({
     }],
     status: { type: String, enum: ['pending', 'assigned', 'picked', 'delivered'], required: true },
     scheduledFor: { type: String, required: true },
-    assignedTo: { type: String },
+    assignedTo: { type: mongoose.Types.ObjectId },
     totalAmount: { type: Number, required: true },
     createdAt: { type: Date, default: new Date() },
     updatedAt: { type: Date, default: new Date() },
 });
 
-type Order = InferSchemaType<typeof OrderSchema>
+export type Order = InferSchemaType<typeof OrderSchema> & { _id: mongoose.Types.ObjectId};
 
 export const OrderModel = model<Order>('Order', OrderSchema);

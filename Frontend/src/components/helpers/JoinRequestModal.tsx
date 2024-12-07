@@ -98,7 +98,7 @@ export const JoinRequestModal = ({ partner, onClose }: JoinRequestModalProps) =>
                                 {...register("phone", {
                                     required: "Phone number is required",
                                     pattern: {
-                                        value: /^[0-9]{10}$/,
+                                        value: /^[0-9]{10,15}$/,
                                         message: "Invalid phone number"
                                     }
                                 })}

@@ -65,7 +65,6 @@ export const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-      {/* Add more dashboard components here, such as a map or charts */}
     </div>
   )
 }

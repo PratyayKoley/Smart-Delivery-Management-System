@@ -1,6 +1,6 @@
-import { InferSchemaType, model, Schema } from "mongoose";
+import mongoose, { InferSchemaType, model, Schema } from "mongoose";
 
-const AssignmentMetricsSchema: Schema = new Schema({
+const AssignmentMetricsSchema = new Schema({
     totalAssigned: {type: Number, required: true},
     successRate: {type: Number, required: true},
     averageTime: {type: Number, required: true},
@@ -10,6 +10,6 @@ const AssignmentMetricsSchema: Schema = new Schema({
     }]
 });
 
-type AssignmentMetrics = InferSchemaType<typeof AssignmentMetricsSchema>
+export type AssignmentMetrics = InferSchemaType<typeof AssignmentMetricsSchema> & { _id: mongoose.Types.ObjectId};
 
 export const AssignmentMetricsModel = model<AssignmentMetrics>('AssignmentMetrics', AssignmentMetricsSchema);

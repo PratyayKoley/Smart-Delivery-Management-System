@@ -1,6 +1,6 @@
-import { InferSchemaType, model, Schema } from "mongoose";
+import mongoose, { InferSchemaType, model, Schema } from "mongoose";
 
-const DeliveryPartnerSchema: Schema = new Schema({
+const DeliveryPartnerSchema = new Schema({
     name: {type: String, required: true},
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
@@ -20,6 +20,6 @@ const DeliveryPartnerSchema: Schema = new Schema({
     },
 });
 
-type DeliveryPartner = InferSchemaType<typeof DeliveryPartnerSchema>;
+export type DeliveryPartner = InferSchemaType<typeof DeliveryPartnerSchema> & { _id: mongoose.Types.ObjectId};
 
 export const DeliveryPartnerModel = model<DeliveryPartner>('DeliveryPartner', DeliveryPartnerSchema);

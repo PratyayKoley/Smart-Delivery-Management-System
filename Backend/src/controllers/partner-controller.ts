@@ -57,9 +57,13 @@ export const getAllPartners = async (req: Request, res: Response): Promise<void>
     }
 }
 
+
 export const updatePartners = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
-    const { attribute, value } = req.body;
+    const updatedPartnerData = req.body;
+
+    console.log('Updating partner:', id, updatedPartnerData);
+
     if (!id) {
         res.status(400).json({
             success: false,
@@ -70,10 +74,11 @@ export const updatePartners = async (req: Request, res: Response): Promise<void>
 
     try {
         const updatedPartner = await DeliveryPartnerModel.findByIdAndUpdate(
-            {
-                _id: id,
-            }
+            id,
+            { $set: updatedPartnerData },
+            { new: true, runValidators: true }
         );
+
         if (!updatedPartner) {
             res.status(404).json({
                 success: false,
@@ -81,11 +86,12 @@ export const updatePartners = async (req: Request, res: Response): Promise<void>
             });
             return;
         }
-        res.send(200).json({
+
+        res.status(200).json({
             success: true,
             message: "Delivery Partner successfully updated.",
             data: updatedPartner,
-        })
+        });
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.error("Error updating partner:", error.message);
@@ -93,10 +99,9 @@ export const updatePartners = async (req: Request, res: Response): Promise<void>
         res.status(500).json({
             success: false,
             message: "Failed to update partner.",
-        })
+        });
     }
-
-}
+};
 
 export const deletePartners = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;

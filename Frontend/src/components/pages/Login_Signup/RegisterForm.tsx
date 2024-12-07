@@ -1,7 +1,7 @@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { registerSchema } from '@/types/types';
+import { adminRegisterSchema, partnerRegisterSchema } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-type RegisterFormValues = z.infer<typeof registerSchema>
+type RegisterFormValues = z.infer<typeof partnerRegisterSchema> | z.infer<typeof adminRegisterSchema>
 
 export const RegisterForm = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -30,24 +30,44 @@ export const RegisterForm = () => {
         { "start": "20:00", "end": "00:00" }
     ]
 
-    const form = useForm<RegisterFormValues>({
-        resolver: zodResolver(registerSchema),
-        defaultValues: {
-            name: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-            role: "partner",
-            phone: "",
-            adminCode: "",
-            areas: [],
-            shift: {
-                slot: ""
-            }
-        }
-    })
+    const getSchemaByRole = (role: string) => {
+        return role === "admin" ? adminRegisterSchema : partnerRegisterSchema;
+    };
 
-    const watchRole = form.watch("role");
+    let [ role, setRole ]= useState("partner");
+
+    // Using the dynamic schema
+    const form = useForm<RegisterFormValues>({
+        resolver: zodResolver(getSchemaByRole(role!)),
+        defaultValues: role === "admin"
+            ? {
+                name: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+                role: "admin",
+                phone: "",
+                adminCode: "",
+            }
+            : {
+                name: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+                role: "partner",
+                phone: "",
+                areas: [],
+                shift: {
+                    slot: "",
+                },
+            },
+    });
+
+    let watchRole = form.watch("role");
+
+    useEffect(()=>{
+        setRole(watchRole)
+    }, [watchRole])
 
     const onSubmit = async (values: RegisterFormValues) => {
         console.log(values);

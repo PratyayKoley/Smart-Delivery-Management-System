@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { OrderModel } from "../models/order.model";
-import { AssignmentModel } from "../models/assignment.model";
+import { Order, OrderModel } from "../models/order.model";
+import { Assignment, AssignmentModel } from "../models/assignment.model";
 import { timeStamp } from "console";
-import { DeliveryPartnerModel } from "../models/deliveryPartner.model";
+import { DeliveryPartner, DeliveryPartnerModel } from "../models/deliveryPartner.model";
+import mongoose from "mongoose";
 
 export const getAllOrders = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -63,9 +64,9 @@ export const getAllOrders = async (req: Request, res: Response): Promise<void> =
 
 export const assignOrders = async (req: Request, res: Response): Promise<void> => {
 
-    const findBestPartner = async (order: typeof OrderModel): Promise<typeof DeliveryPartnerModel | null> => {
+    const findBestPartner = async (order: Order): Promise<DeliveryPartner | null> => {
         const availablePartners = await DeliveryPartnerModel.find({
-            status: 'active',
+            status: "active",
             currentLoad: { $lt: 3 },
             areas: order.area,
             'shift.start': { $lte: order.scheduledFor },
@@ -79,7 +80,7 @@ export const assignOrders = async (req: Request, res: Response): Promise<void> =
         const { orderId } = req.body;
         
         // Fetch the order by ID
-        const order = await OrderModel.findById(orderId) as typeof OrderModel | null;
+        const order = await OrderModel.findById(orderId) as Order | null;
 
         if (!order) {
             res.status(404).json({
@@ -99,10 +100,9 @@ export const assignOrders = async (req: Request, res: Response): Promise<void> =
             });
             return;
         }
-
         // Create a new assignment record
-        const assignment = await AssignmentModel.create<typeof AssignmentModel>({
-            orderId: order._id,
+        const assignment = await AssignmentModel.create<Assignment>({
+            orderId: order.orderNumber,
             partnerId: availablePartner._id,
             timestamp: new Date(),
             status: 'success',
@@ -110,9 +110,11 @@ export const assignOrders = async (req: Request, res: Response): Promise<void> =
 
         // Update order and partner data
         order.status = 'assigned';
-        order.assignedTo = availablePartner._id;
+        // @ts-ignore
+        order.assignedTo = availablePartner._id ;
         availablePartner.currentLoad += 1;
-
+        
+        // @ts-ignore
         await Promise.all([order.save(), availablePartner.save()]);
 
         res.status(200).json({

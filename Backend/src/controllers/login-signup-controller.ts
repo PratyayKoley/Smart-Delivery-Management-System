@@ -190,6 +190,7 @@ export const getUserData = async (req: Request, res: Response) => {
 
 export const joinAsPartner = async (req: Request, res: Response) => {
     const data = req.body;
+    console.log(data.email);
 
     if (!data) {
         res.status(400).json({
@@ -199,8 +200,20 @@ export const joinAsPartner = async (req: Request, res: Response) => {
         return;
     }
 
+    if(data.status !== 'new'){
+        res.status(400).json({
+            success: false,
+            message: "Only new Partners are allowed to request.",
+        });
+        return;
+    }
+
     try {
-        const reqPartner = await DeliveryPartnerModel.findOneAndUpdate({ email: data.email, status: 'pending', new: true });
+        const reqPartner = await DeliveryPartnerModel.findOneAndUpdate(
+            { email: data.email },
+            { status: "pending" },
+            { new: true }
+        );
 
         if (!reqPartner) {
             res.status(404).json({
@@ -210,7 +223,8 @@ export const joinAsPartner = async (req: Request, res: Response) => {
             return;
         }
 
-        res.status(200).json({
+        console.log(reqPartner)
+        res.status(201).json({
             success: true,
             message: "Partner updated successfully.",
             data: reqPartner,
@@ -222,5 +236,115 @@ export const joinAsPartner = async (req: Request, res: Response) => {
             message: "Internal server error.",
         });
         return;
+    }
+}
+
+export const getPendingPartner = async (req: Request, res: Response) => {
+    try {
+        const pendingPartners = await DeliveryPartnerModel.find({ status: 'pending' })
+
+        if (!pendingPartners) {
+            res.status(404).json({
+                success: false,
+                message: "No Partners Found",
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            partners: pendingPartners,
+            message: "Success",
+        })
+    } catch (error) {
+        console.error("Error occurred : ", (error as Error).message);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error occurred.",
+        })
+    }
+}
+
+export const acceptPartner = async (req: Request, res: Response) => {
+    const data = req.body;
+
+    if (!data.partnerId || !data.action) {
+        res.status(400).json({
+            success: false,
+            message: "No Credentials found. Try Again."
+        })
+    }
+
+    try {
+        const partner = await DeliveryPartnerModel.findById(data.partnerId);
+
+        if (!partner) {
+            res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+            return;
+        }
+
+        let newStatus: string;
+        if (data.action === 'accept') {
+            newStatus = 'inactive';
+        }
+        else if (data.action === 'reject') {
+            newStatus = 'new';
+        }
+        else {
+            res.status(400).json({
+                success: false,
+                message: "Invalid action provided.",
+            });
+            return;
+        }
+
+        const updatedPartner = await DeliveryPartnerModel.findByIdAndUpdate(
+            data.partnerId,
+            { status: newStatus },
+            { new: true },
+        )
+
+        res.status(200).json({
+            success: true,
+            message: `Partner status updated to ${newStatus}.`,
+            data: updatedPartner
+        })
+    } catch (error) {
+        console.error("Error processing accept/reject action:", (error as Error).message);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error.",
+        });
+        return;
+    }
+}
+
+export const getActiveInactivePartners = async (req: Request, res: Response) => {
+    try {
+        const partners = await DeliveryPartnerModel.find({
+            status: { $in: ['active', 'inactive']}
+        });
+
+        if(!partners){
+            res.status(404).json({
+                success: false,
+                message: "No Partners Found",
+            });
+            return;
+        }
+
+        res.status(201).json({
+            success: true,
+            message: "Successful",
+            partners: partners,
+        })
+    } catch (error) {
+        console.error("Error occurred: ", (error as Error).message);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        })
     }
 }
