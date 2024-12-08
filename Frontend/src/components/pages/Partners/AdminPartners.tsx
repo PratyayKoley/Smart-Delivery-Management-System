@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from "@/components/ui/table";
-import { PendingPartnerModal } from "@/components/helpers/PendingPartnerModal";
+import { PendingPartnerModal } from "@/components/helpers/pendingPartnerModal";
 import { EditPartnerModal } from "@/components/helpers/EditPartnerModal";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
