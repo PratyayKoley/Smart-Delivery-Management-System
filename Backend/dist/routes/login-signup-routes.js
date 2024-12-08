@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const login_signup_controller_1 = require("../controllers/login-signup-controller");
+const router = (0, express_1.Router)();
+router.post("/login", login_signup_controller_1.LoginControl);
+router.post("/register", login_signup_controller_1.RegisterControl);
+router.get("/verify-token", login_signup_controller_1.verifyToken);
+router.post("/get-user-data", login_signup_controller_1.getUserData);
+router.post("/join-request", login_signup_controller_1.joinAsPartner);
+router.get("/pending-partners", login_signup_controller_1.getPendingPartner);
+router.post("/partner-action", login_signup_controller_1.acceptPartner);
+router.get("/active-and-inactive-partners", login_signup_controller_1.getActiveInactivePartners);
+exports.default = router;
