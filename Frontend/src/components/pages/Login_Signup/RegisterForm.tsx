@@ -70,7 +70,6 @@ export const RegisterForm = () => {
     }, [watchRole])
 
     const onSubmit = async (values: RegisterFormValues) => {
-        console.log(values);
         setIsLoading(true);
         setErrorMessage(null);
         try {

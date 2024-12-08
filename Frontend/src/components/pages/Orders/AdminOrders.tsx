@@ -22,7 +22,6 @@ export const Orders = () => {
   const pullOrderData = async () => {
     try {
       const response = await axios.get<OrdersResponse>(`${import.meta.env.VITE_BACKEND_LINK}/api/orders`)
-      console.log("Fetched orders:", response.data)
       if (response.data.success) {
         setOrders(response.data.data)
       } else {

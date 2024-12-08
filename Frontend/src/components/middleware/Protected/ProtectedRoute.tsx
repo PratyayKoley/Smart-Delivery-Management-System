@@ -34,7 +34,6 @@ export const ProtectedRoute = ({ children, userValidation }: ProtectedRouteProps
             })
 
             const data = await response.data;
-            console.log(data);
             if (data.success) {
                 setAuthenticate(true);
                 setUserRole(data.data.role);

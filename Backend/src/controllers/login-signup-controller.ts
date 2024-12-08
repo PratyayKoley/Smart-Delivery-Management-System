@@ -100,7 +100,6 @@ export const RegisterControl = async (req: Request, res: Response) => {
             }
         }
 
-        console.log(reqData);
         const newUser = await DeliveryPartnerModel.create(reqData);
 
         res.status(201).json({
@@ -161,7 +160,6 @@ export const verifyToken = async (req: Request, res: Response) => {
 
 export const getUserData = async (req: Request, res: Response) => {
     const { email } = req.body;
-    console.log(email);
 
     try {
         const userData = await DeliveryPartnerModel.findOne({ email: email });
@@ -190,7 +188,6 @@ export const getUserData = async (req: Request, res: Response) => {
 
 export const joinAsPartner = async (req: Request, res: Response) => {
     const data = req.body;
-    console.log(data.email);
 
     if (!data) {
         res.status(400).json({
@@ -215,7 +212,6 @@ export const joinAsPartner = async (req: Request, res: Response) => {
             return;
         }
 
-        console.log(reqPartner)
         res.status(201).json({
             success: true,
             message: "Partner updated successfully.",

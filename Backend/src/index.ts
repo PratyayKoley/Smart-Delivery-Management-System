@@ -10,6 +10,7 @@ import partnerRoutes from "./routes/partner-routes";
 import orderRoutes from "./routes/order-routes";
 import assignmentRoutes from "./routes/assignment-routes";
 import userLoginRegisterRoutes from "./routes/login-signup-routes";
+import dashboardRoutes from "./routes/dashboard-routes";
 import bodyParser from 'body-parser';
 
 // Initialization
@@ -26,6 +27,7 @@ app.use("/api/partners", partnerRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/user", userLoginRegisterRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Server Connection
 app.get("/", (req: Request, res: Response): void => {

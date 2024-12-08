@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Order, OrderModel } from "../models/order.model";
 import { Assignment, AssignmentModel } from "../models/assignment.model";
-import { timeStamp } from "console";
 import { DeliveryPartner, DeliveryPartnerModel } from "../models/deliveryPartner.model";
 import mongoose from "mongoose";
 
@@ -87,7 +86,6 @@ export const assignOrders = async (req: Request, res: Response): Promise<void> =
       'shift.end': { $gte: orderTime },
     });
 
-    console.log(availablePartners);
     return availablePartners;
   };
 
@@ -99,20 +97,17 @@ export const assignOrders = async (req: Request, res: Response): Promise<void> =
       const estimatedTime = estimateDeliveryTime(partner.currentLoad);
       const score = estimatedTime * (1 + partner.currentLoad * 0.2); // Consider both estimated time and load
 
-      console.log("Score: ", score);
       if (score < bestScore) {
         bestScore = score;
         bestPartner = partner;
       }
     }
-    console.log("Function Best Partner: ", bestPartner);
 
     return bestPartner;
   };
 
   try {
     const { orderId } = req.body;
-    console.log("Order ID: ", orderId);
 
     // Fetch the order by ID
     const order = await OrderModel.findById(orderId) as Order | null;
@@ -124,24 +119,32 @@ export const assignOrders = async (req: Request, res: Response): Promise<void> =
       });
       return;
     }
-    console.log("Order Database: ", order);
 
     // Find the top 5 available partners
     const topPartners = await findBestPartners(order);
-    console.log("Top Partners: ", topPartners)
 
     if (topPartners.length === 0) {
+      // Create a failed assignment record
+      const failedAssignment = await AssignmentModel.create({
+        orderId: order.orderNumber,
+        partnerId: null,
+        timestamp: new Date(),
+        status: 'failed',
+        reason: 'Partner not available',
+      });
+
+
       res.status(400).json({
         success: false,
         status: 400,
         message: 'No available partners for this order',
+        data: { assignment: failedAssignment },
       });
       return;
     }
 
     // Select the best partner
     const bestPartner = selectBestPartner(order, topPartners);
-    console.log("Best Partners: ", bestPartner);
 
     // Create a new assignment record
     const assignment = await AssignmentModel.create<Assignment>({
@@ -151,7 +154,6 @@ export const assignOrders = async (req: Request, res: Response): Promise<void> =
       status: 'success',
     });
 
-    console.log("Assignment done:", assignment);
 
     // Update order and partner data
     order.status = 'assigned';

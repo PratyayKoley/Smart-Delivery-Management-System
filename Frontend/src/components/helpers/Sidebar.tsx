@@ -1,4 +1,4 @@
-import { ClipboardList, Home, Package, Users, X } from "lucide-react"
+import { ClipboardList, Home, Package, Users, X, User } from "lucide-react"
 import { ModeToggle } from "./ModeToggle"
 import { Link, useLocation } from "react-router-dom"
 import { Button } from "../ui/button"
@@ -23,7 +23,7 @@ export const Sidebar = ({ open, setOpen }: SidebarProps) => {
 
     const links: SideBarLinkType[] = [
         { label: "Dashboard", icon: Home, href: "/" },
-        { label: "Partners", icon: Users, href: "/partners" },
+        ...(userRole === 'admin' ? [{ label: "Partners", icon: Users, href: "/partners" }] : [{ label: "Profile", icon: User, href: "/partners" }]),
         { label: "Orders", icon: Package, href: "/orders" },
         ...(userRole === "admin"
             ? [{ label: "Assignments", icon: ClipboardList, href: "/assignments" }]

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { DeliveryPartnerModel } from "../models/deliveryPartner.model";
+import { OrderModel } from "../models/order.model";
 
 export const createPartners = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -62,7 +63,6 @@ export const updatePartners = async (req: Request, res: Response): Promise<void>
     const { id } = req.params;
     const updatedPartnerData = req.body;
 
-    console.log('Updating partner:', id, updatedPartnerData);
 
     if (!id) {
         res.status(400).json({
@@ -138,3 +138,84 @@ export const deletePartners = async (req: Request, res: Response): Promise<void>
         })
     }
 }
+
+export const calculateMetrics = async (req: Request, res: Response) => {
+    try {
+        const { partner } = await req.body;
+        const currentDate = new Date();
+        const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0));
+
+        console.log(partner)
+
+        // Calculate active orders
+        const activeOrders = await OrderModel.countDocuments({
+            assignedTo: partner._id,
+            status: { $in: ['assigned', 'picked'] }
+        });
+
+        // Calculate completed orders today
+        const completedToday = await OrderModel.countDocuments({
+            assignedTo: partner._id,
+            status: 'delivered',
+            updatedAt: { $gte: startOfDay }
+        });
+
+        // Calculate average delivery time
+        const averageDeliveryTime = await OrderModel.aggregate([
+            {
+                $match: {
+                    assignedTo: partner._id,
+                    status: 'delivered'
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    avgTime: { $avg: { $subtract: ['$updatedAt', '$createdAt'] } }
+                }
+            }
+        ]);
+
+        const avgTimeInMinutes = averageDeliveryTime.length > 0
+            ? Math.round(averageDeliveryTime[0].avgTime / (1000 * 60))
+            : 0;
+
+        // Fetch total completed and canceled orders for the partner
+        const totalCompletedOrders = await OrderModel.countDocuments({
+            assignedTo: partner._id,
+            status: 'delivered'
+        });
+
+        const totalCanceledOrders = await OrderModel.countDocuments({
+            assignedTo: partner._id,
+            status: 'canceled'
+        });
+
+        // Calculate rating (example logic: total completed orders minus total canceled orders)
+        const updatedRating = Math.max(0, Math.min(5, partner.metrics.rating + (totalCompletedOrders - totalCanceledOrders) * 0.01));
+
+        // Update the partner's metrics in the database
+        await DeliveryPartnerModel.findByIdAndUpdate(partner._id, {
+            $set: {
+                'metrics.completedOrders': totalCompletedOrders,
+                'metrics.cancelledOrders': totalCanceledOrders,
+                'metrics.rating': updatedRating
+            }
+        });
+
+        // Prepare dashboard data
+        const dashboardData = {
+            activeOrders,
+            completedToday,
+            currentArea: partner.areas[0] || 'Not set',
+            averageDeliveryTime: `${avgTimeInMinutes} mins`,
+            rating: updatedRating.toFixed(1),
+        };
+
+        res.json(dashboardData);
+    } catch (error) {
+        console.error('Error in calculateMetrics:', error);
+        res.status(500).json({ error: 'Error fetching dashboard data' });
+    }
+};
+

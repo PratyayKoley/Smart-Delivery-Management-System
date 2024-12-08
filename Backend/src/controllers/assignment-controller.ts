@@ -7,7 +7,6 @@ import { OrderModel } from "../models/order.model";
 export const getAssignments = async (req: Request, res: Response) => {
     try {
         const assignmentData = await AssignmentModel.find();
-        console.log(assignmentData);
 
         if (!assignmentData || assignmentData.length === 0) {
             res.status(400).json({
@@ -96,6 +95,7 @@ export const getAssignmentMetrics = async (req: Request, res: Response): Promise
 
 export const runMetricsEvaluation = async (req: Request, res: Response): Promise<void> => {
     try {
+        // Fetch all assignments and calculate metrics
         const assignments = await AssignmentModel.find();
         const averageAssignmentTime = await calculateAverageAssignmentTime();
 
@@ -105,20 +105,29 @@ export const runMetricsEvaluation = async (req: Request, res: Response): Promise
             averageTime: averageAssignmentTime,
             // @ts-ignore
             failureReasons: aggregateFailureReasons(assignments)
-        }
+        };
 
-        const newMetrics = await AssignmentMetricsModel.create(metrics);
+        // Update or create the metrics document
+        const updatedMetrics = await AssignmentMetricsModel.findOneAndUpdate(
+            {}, // Match condition: empty to always find the single metrics document
+            metrics, // Updated metrics object
+            {
+                new: true, // Return the updated document
+                upsert: true, // Create the document if it doesn't exist
+                setDefaultsOnInsert: true // Apply default values on insert
+            }
+        );
 
-        if (!newMetrics) {
+        if (!updatedMetrics) {
             res.status(404).json({
                 success: false,
-                message: 'Failed to create new metrics.'
-            })
+                message: 'Failed to update metrics.'
+            });
         } else {
             res.status(200).json({
                 success: true,
-                message: 'Metrics successfully calculated and saved.',
-                data: newMetrics,
+                message: 'Metrics successfully calculated and updated.',
+                data: updatedMetrics,
             });
         }
     } catch (error) {
@@ -126,6 +135,6 @@ export const runMetricsEvaluation = async (req: Request, res: Response): Promise
         res.status(500).json({
             success: false,
             message: 'Internal Server Error',
-        })
+        });
     }
-}
+};

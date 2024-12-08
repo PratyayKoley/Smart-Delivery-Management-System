@@ -67,7 +67,6 @@ export const PartnersOrders = () => {
 
     const handleUpdateStatus = async (orderId: string, newStatus: "pending" | "assigned" | "picked" | "delivered") => {
         const success = await updateOrderStatusInDB(orderId, newStatus);
-        console.log(success);
         if (success) {
             setCurrentAssignments((prevAssignments) =>
                 prevAssignments.map((assignment) =>

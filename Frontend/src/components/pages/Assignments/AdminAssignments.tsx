@@ -125,7 +125,7 @@ export const Assignments = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold md:text-3xl">Assignment Dashboard</h1>
-        <Button variant="secondary" onClick={runMetricsEvaluation}>
+        <Button variant="default" onClick={runMetricsEvaluation}>
           Evaluate Metrics
         </Button>
       </div>
