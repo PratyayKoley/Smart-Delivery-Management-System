@@ -29,34 +29,61 @@ The Smart Delivery Management System is a modern web application that provides a
 
 ## Getting Started
 
-    **Frontend**
+**Frontend**
 
-    1. Clone the repository:`git clone https://github.com/PratyayKoley/smart-delivery-management.git`
-    2. Install dependencies:  `cd Frontend && npm install`
-    3. Start the development server:  `npm run dev`
-    4. Open the application in your browser:  `http://localhost:5173`
+1. Clone the repository:
+    ``` 
+    git clone "https://github.com/PratyayKoley/smart-delivery-management.git"
+    ```
+2. Install dependencies:  
+    ```
+    cd Frontend && npm install
+    ```
+3. Start the development server:  
+    ```
+    npm run dev
+    ```
+4. Open the application in your browser:  
+    ```
+    http://localhost:5173
+    ```
 
-    **Backend**
+**Backend**
 
-    1. Install dependencies:`cd Backend && npm install`
-    2. Start the development server: `npm start`
-    3. Open the server in your browser: `http://localhost:5000`
+1. Install dependencies:
+    ```
+    cd Backend && npm install
+    ```
+2. Start the development server: 
+    ```
+    npm start
+    ```
+3. Open the server in your browser: 
+    ```
+    http://localhost:5000
+    ```
 
-    **Environment Variables Setup**
+**Environment Variables Setup**
 
-    1. Backend`.env` File
+1. Backend`.env` File:
+
     Create a `.env` file in the Backend directory and add the following variables:
 
-    ``PORT=your_port_number``
+    ```
+    PORT=your_port_number
 
-    ``MONGO_URI=your_mongo_atlas_connection_uri``
+    MONGO_URI=your_mongo_atlas_connection_uri
 
-    ``JWT_SECRET=your_secret_string``
+    JWT_SECRET=your_secret_string
+    ```
 
-    2. Frontend `.env` File
+2. Frontend `.env` File:
+    
     Create a `.env` file in the Frontend directory and add the following variables:
 
-    ``VITE_BACKEND_LINK=your_backend_link``
+    ```
+    VITE_BACKEND_LINK=your_backend_link
+    ```
 
 ## Project Structure
 
@@ -93,5 +120,6 @@ The Smart Delivery Management System is a modern web application that provides a
 
 ## Deployment
 
-    The application is deployed on Vercel and can be accessed at the following URL:
-    [Smart Delivery Management System](https://smart-delivery-management-system.vercel.app/)
+The application is deployed on Vercel and can be accessed at the following URL:
+
+[Smart Delivery Management System](https://smart-delivery-management-system.vercel.app/)
