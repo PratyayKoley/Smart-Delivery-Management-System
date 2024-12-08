@@ -200,14 +200,6 @@ export const joinAsPartner = async (req: Request, res: Response) => {
         return;
     }
 
-    if(data.status !== 'new'){
-        res.status(400).json({
-            success: false,
-            message: "Only new Partners are allowed to request.",
-        });
-        return;
-    }
-
     try {
         const reqPartner = await DeliveryPartnerModel.findOneAndUpdate(
             { email: data.email },

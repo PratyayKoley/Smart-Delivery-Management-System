@@ -38,7 +38,11 @@ export const Partners = () => {
   }, []);
 
   const filteredPartners = partners.filter((partner) =>
-    partner.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    // Search in name, email, phone, and partnerId (convert to string if necessary)
+    (partner.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     partner._id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     partner.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     partner.phone?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const handleEdit = async (updatedPartner: Partial<DeliveryPartner>) => {

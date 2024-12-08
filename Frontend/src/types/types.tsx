@@ -50,9 +50,9 @@ export type Order = {
 }
 
 export type Assignment = {
-    orderId: string;
+    orderId: Number;
     partnerId: string;
-    timeStamp: Date;
+    timestamp: Date;
     status: 'success' | 'failed';
     reason?: string;
 }

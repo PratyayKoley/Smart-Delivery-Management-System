@@ -48,6 +48,7 @@ export const JoinRequestModal = ({ partner, onClose }: JoinRequestModalProps) =>
 
             if (response.data.success) {
                 onClose();
+                window.location.reload();
             } else {
                 setError(response.data.message || "Failed to submit request. Please try again.");
             }

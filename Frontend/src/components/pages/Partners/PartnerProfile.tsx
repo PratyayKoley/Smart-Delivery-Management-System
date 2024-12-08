@@ -10,7 +10,7 @@ import { JoinRequestModal } from "@/components/helpers/JoinRequestModal";
 
 export const PartnerProfile = () => {
   const { userEmail } = useContext(UserRoleContext)!;
-  const [partner, setPartner] = useState<DeliveryPartner | null>(null); // Updated to handle `null` for loading state
+  const [partner, setPartner] = useState<DeliveryPartner | null>(null); 
   const [loading, setLoading] = useState(true); // Add loading state
   const [error, setError] = useState<string | null>(null); // Error state
   const [showJoinModal, setShowJoinModal] = useState<boolean>(false);
