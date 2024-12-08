@@ -53,6 +53,7 @@ export const Dashboard = () => {
   }
 
   // Line Chart Data (for activeOrders and recentAssignments)
+  // Dummy Data
   const lineChartData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
     datasets: [
@@ -74,6 +75,7 @@ export const Dashboard = () => {
   };
 
   // Bar Chart Data (for availablePartners)
+  // Dummy Data
   const barChartData = {
     labels: ['Partner 1', 'Partner 2', 'Partner 3', 'Partner 4'],
     datasets: [
@@ -88,6 +90,7 @@ export const Dashboard = () => {
   };
 
   // Doughnut Chart Data (for recentAssignments)
+  // Dummy Data
   const doughnutChartData = {
     labels: ['Completed', 'Pending', 'In Progress'],
     datasets: [
@@ -99,11 +102,12 @@ export const Dashboard = () => {
   };
 
   // Pie Chart Data (for topAreas distribution)
+  // Dummy Data
   const pieChartData = {
-    labels: metrics.topAreas.length ? metrics.topAreas : ['Area 1', 'Area 2', 'Area 3'], // Default labels
+    labels: metrics.topAreas.length ? metrics.topAreas : ['Area 1', 'Area 2', 'Area 3'], 
     datasets: [
       {
-        data: [20, 30, 50], // Example data, replace with real values
+        data: [20, 30, 50], 
         backgroundColor: ['#FF6384', '#36A2EB', '#FFCD56'],
       },
     ],

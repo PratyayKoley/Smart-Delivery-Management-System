@@ -60,6 +60,7 @@ export const PartnersDashboard = () => {
     navigate("/auth");
   }
 
+  // Dummy Data
   const activeOrdersData = [
     { date: '2024-12-01', count: 5 },
     { date: '2024-12-02', count: 6 },
@@ -68,6 +69,7 @@ export const PartnersDashboard = () => {
     { date: '2024-12-05', count: 7 }
   ];
   
+  // Dummy Data
   const ratingData = [
     { date: '2024-12-01', rating: 4.2 },
     { date: '2024-12-02', rating: 4.3 },
