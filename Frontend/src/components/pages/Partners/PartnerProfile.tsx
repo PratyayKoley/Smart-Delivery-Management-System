@@ -3,17 +3,22 @@ import { DeliveryPartner } from "@/types/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Package, Star, TrendingUp, AlertTriangle } from "lucide-react";
+import { Package, Star, TrendingUp, AlertTriangle, Edit } from "lucide-react";
 import { UserRoleContext } from "@/components/middleware/Protected/ProtectedRoute";
 import axios from "axios";
 import { JoinRequestModal } from "@/components/helpers/JoinRequestModal";
+import { EditPartnerModal } from "@/components/helpers/EditPartnerModal";
+import { useToast } from "@/hooks/use-toast";
 
 export const PartnerProfile = () => {
   const { userEmail } = useContext(UserRoleContext)!;
-  const [partner, setPartner] = useState<DeliveryPartner | null>(null); 
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState<string | null>(null); // Error state
+  const [partner, setPartner] = useState<DeliveryPartner | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showJoinModal, setShowJoinModal] = useState<boolean>(false);
+  const [editingPartner, setEditingPartner] = useState<Partial<DeliveryPartner> | null>(null);
+  const { toast } = useToast();
+
 
   const getUserData = async () => {
     try {
@@ -42,12 +47,65 @@ export const PartnerProfile = () => {
     }
   }, [userEmail]);
 
+  const handleEditProfile = async (updatedPartner: Partial<DeliveryPartner>) => {
+    if (!updatedPartner._id) {
+      toast({
+        title: "Error",
+        description: "Invalid partner ID",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Set the partner data to be edited in the modal right away
+    setEditingPartner({ ...partner });
+
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_LINK}/api/partners/${updatedPartner._id}`,
+        updatedPartner
+      );
+
+      if (response.data.success) {
+        // Ensure partner is not null and update it
+        setPartner((prevPartner) => {
+          if (prevPartner) {
+            return {
+              ...prevPartner,
+              ...updatedPartner,
+            };
+          }
+          return null;
+        });
+
+        toast({
+          title: "Success",
+          description: "Partner updated successfully",
+        });
+      } else {
+        throw new Error(response.data.message || "Failed to update partner");
+      }
+    } catch (error) {
+      console.error("Error updating partner:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update partner. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleModalClose = () => {
+    setEditingPartner(null); // Close the modal only when it's explicitly triggered
+  };
+
+
   if (loading) {
     return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div className="text-red-500">{error}</div>; 
+    return <div className="text-red-500">{error}</div>;
   }
 
   if (!partner) {
@@ -68,8 +126,15 @@ export const PartnerProfile = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Personal Information</CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEditProfile(partner)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -90,7 +155,6 @@ export const PartnerProfile = () => {
               <p><strong>Start Time:</strong> {partner.shift.start}</p>
               <p><strong>End Time:</strong> {partner.shift.end}</p>
               <p><strong>Areas:</strong> {partner.areas.join(", ")}</p>
-              <Button className="mt-4">End Shift</Button>
             </div>
           </CardContent>
         </Card>
@@ -133,6 +197,14 @@ export const PartnerProfile = () => {
           </div>
         </CardContent>
       </Card>
+      {editingPartner && (
+        <EditPartnerModal
+          partner={editingPartner}
+          isOpen={!!editingPartner}  // Show modal when editingPartner is set
+          onClose={handleModalClose}  // Close modal when triggered
+          onSave={handleEditProfile}
+        />
+      )}
     </div>
   );
 };

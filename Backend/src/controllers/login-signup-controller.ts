@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { DeliveryPartnerModel } from "../models/deliveryPartner.model";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
+import cron from "node-cron";
 
 dotenv.config();
 
@@ -312,10 +312,10 @@ export const acceptPartner = async (req: Request, res: Response) => {
 export const getActiveInactivePartners = async (req: Request, res: Response) => {
     try {
         const partners = await DeliveryPartnerModel.find({
-            status: { $in: ['active', 'inactive']}
+            status: { $in: ['active', 'inactive'] }
         });
 
-        if(!partners){
+        if (!partners) {
             res.status(404).json({
                 success: false,
                 message: "No Partners Found",
@@ -335,4 +335,35 @@ export const getActiveInactivePartners = async (req: Request, res: Response) => 
             message: "Internal Server Error",
         })
     }
+}
+
+export const scheduleStatusUpdate = () => {
+    cron.schedule('* * * * *', async () => {
+        const currentTime = new Date();
+        const currentHour = currentTime.getHours();
+        const currentMinute = currentTime.getMinutes();
+        console.log(`${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`);
+
+        try {
+            await DeliveryPartnerModel.updateMany(
+                {
+                    'shift.start': `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`,
+                    status: 'inactive'
+                },
+                { $set: { status: 'active' } }
+            );
+
+            await DeliveryPartnerModel.updateMany(
+                {
+                    'shift.end': `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`,
+                    status: 'active'
+                },
+                { $set: { status: 'inactive' } }
+            );
+
+            console.log('Delivery Partners updated successfully');
+        } catch (error) {
+            console.error('Error Occurred: ', error);
+        }
+    });
 }

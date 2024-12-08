@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { scheduleStatusUpdate } from './controllers/login-signup-controller';
+
 
 dotenv.config();
 
@@ -12,6 +14,7 @@ if (!url) {
 mongoose.connect(url)
     .then((): void => {
         console.log("Connection Successful");
+        scheduleStatusUpdate();
     })
     .catch((err): void => {
         console.log("Error connecting to MongoDB : ", err);
