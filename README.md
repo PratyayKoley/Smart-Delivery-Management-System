@@ -118,6 +118,20 @@ The Smart Delivery Management System is a modern web application that provides a
    * tsconfig.json: This is the TypeScript configuration file, defining the compiler options and project structure.
    * tailwind.config.js: This file configures the Tailwind CSS framework.
 
+## Working
+
+1. You can register as an Admin or as a Delivery Partner
+2. If you are an Admin, you have to give AdminCode as "qwertyuiop"
+3. If you are a delivery partner, you can directly register by giving the details asked.
+4. Once registered, login page opens up for both Admin and Partner.
+5. If you are a new Partner, you will not receive any orders unless you request the Admin to join as a Partner. Once requested, Admin has the authority to either accept or reject a partner on the Partners List.
+6. Once you are accepted as a Partner, you will start to receive orders when admin runs the order assignment algorithm.
+7. As of now, the orders are static and can be post through thunderclient or Postman by giving a post request to backend-link/api/orders.
+8. Once assigned, you will get to see all the assigned Orders and its details and your metrics in the Dashboard.
+9. If you are an Admin, you will get the records of all Partners, Orders, Assignments, and Metrics of the Assigned Orders.
+10. You have the authority to edit the partner details, delete the partner, get details of all orders.
+11. For the ease of visualization, there are some static graphs implemented which takes dummy data now, but query can be made to database to get the real and actual data.
+
 ## Deployment
 
 The application is deployed on Vercel and can be accessed at the following URL:
